@@ -1,0 +1,29 @@
+provider "aws" {
+  region = "us-east-1"  # This can be set to a default region if necessary
+}
+
+# Define local values
+locals {
+  lower_environment = lower(var.environment)  # Convert the environment to lowercase
+
+  # Generate dynamic bucket names for allowed regions if create_buckets is true
+  bucket_names = [
+    for region in var.region_list : "${local.lower_environment}-${region}-bucket"
+    if contains(var.allowed_regions, region) && var.create_buckets
+  ]
+}
+
+# Create S3 buckets based on the defined local values
+resource "aws_s3_bucket" "buckets" {
+  for_each = toset(local.bucket_names)  # Only create buckets for names in the list
+
+  bucket = each.value
+
+  acl    = "private"  # Setting ACL to private; adjust as needed
+
+  tags = {
+    Environment = local.lower_environment  # Use the lowercase environment
+    Name        = each.value
+  }
+}
+
