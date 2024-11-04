@@ -1,0 +1,35 @@
+pipeline {
+    agent any 
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building...'
+                sh 'mkdir -p build && echo "sample artifact" > build/artifact.txt'
+            }
+        }
+        stage('List Files') {
+            steps {
+                script {
+                    sh 'ls -R' 
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                echo 'Testing...'
+            }
+        }
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/*', fingerprint: true
+                echo 'Artifacts archived.'
+            }
+        }
+    }
+    post {
+        always {
+            echo 'This will always run after the pipeline.'
+        }
+    }
+}
+

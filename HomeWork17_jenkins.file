@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Test') {
+            steps {
+                script {
+                    if (fileExists('build/index.html')) {
+                        echo 'Running tests...'
+                        sh 'npm test'
+                    } else {
+                        echo 'Index file does not exist.'
+                    }
+                }
+            }
+        }
+    }
+}
+
